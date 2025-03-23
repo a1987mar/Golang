@@ -52,7 +52,7 @@ func (c *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
-		nt, err := jwt.NewJWT(c.Auth.Secret).Create(res_)
+		nt, err := jwt.NewJWT(c.Auth.Secret).Create(jwt.JWTData{Email: res_})
 		if err != nil {
 			http.Error(w, "bad secret", http.StatusBadRequest)
 			return
@@ -77,7 +77,7 @@ func (c *AuthHandler) RegUser() http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "", http.StatusBadRequest)
 		}
-		nt, err := jwt.NewJWT(c.Auth.Secret).Create(res_)
+		nt, err := jwt.NewJWT(c.Auth.Secret).Create(jwt.JWTData{Email: res_})
 		if err != nil {
 			http.Error(w, "bad secret", http.StatusBadRequest)
 			return
@@ -96,7 +96,7 @@ func (c *AuthHandler) Register() http.HandlerFunc {
 		if err != nil {
 			return
 		}
-		nt, err := jwt.NewJWT(c.Auth.Secret).Create(body.Email)
+		nt, err := jwt.NewJWT(c.Auth.Secret).Create(jwt.JWTData{Email: body.Email})
 		if err != nil {
 			http.Error(w, "bad secret", http.StatusBadRequest)
 			return

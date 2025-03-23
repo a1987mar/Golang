@@ -1,6 +1,7 @@
 package link
 
 import (
+	"go/adv-demo/configs"
 	"go/adv-demo/middleware"
 	"go/adv-demo/pkg/req"
 	res "go/adv-demo/pkg/respose"
@@ -12,10 +13,12 @@ import (
 
 type LinkHandler struct {
 	LinkRepository *LinkRepository
+	Config         *configs.Config
 }
 
 type LinkHandlerDeps struct {
 	LinkRepository *LinkRepository
+	Config         *configs.Config
 }
 
 func NewAuthHandler(router *http.ServeMux, deps LinkHandlerDeps) {
@@ -23,7 +26,7 @@ func NewAuthHandler(router *http.ServeMux, deps LinkHandlerDeps) {
 		LinkRepository: deps.LinkRepository,
 	}
 	router.HandleFunc("POST /link", handler.Create())
-	router.Handle("PATCH /link/{id}", middleware.IsAuthed(handler.Update()))
+	router.Handle("PATCH /link/{id}", middleware.IsAuthed(handler.Update(), deps.Config))
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
 	router.HandleFunc("GET /link/{hash}", handler.Goto())
 

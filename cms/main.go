@@ -29,6 +29,7 @@ func main() {
 	})
 	link.NewAuthHandler(router, link.LinkHandlerDeps{
 		LinkRepository: linkrep,
+		Config:         conf,
 	})
 	mark.NewMarkHanler(router, mark.MarkHandlerDeps{
 		MarkRepository: markrep,
