@@ -1,26 +1,41 @@
 package middleware
 
 import (
-	"fmt"
+	"context"
 	"go/adv-demo/configs"
 	"go/adv-demo/pkg/jwt"
 	"net/http"
 	"strings"
 )
 
+type keyEmail string
+
+const (
+	ContextEmailKey keyEmail = "ContextEmailKey"
+)
+
+func writeUnathed(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusUnauthorized)
+	w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+}
+
 func IsAuthed(next http.Handler, config *configs.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		header := r.Header
-		auth := header.Get("Authorization")
-		if auth == "" {
-			fmt.Println("not filled")
+		auth := r.Header.Get("Authorization")
+		if !strings.HasPrefix(auth, "Barier ") {
+			writeUnathed(w)
 			return
 		}
-		fmt.Println(auth)
 		token := strings.TrimPrefix(auth, "Barier ")
-		isValid, data := jwt.NewJWT(config.Auth.Secret).ParseJWT(token)
-		fmt.Println(isValid)
-		fmt.Println(data)
-		fmt.Println(token)
+		isvalid, data := jwt.NewJWT(config.Auth.Secret).ParseJWT(token)
+		if !isvalid {
+			writeUnathed(w)
+			return
+		}
+
+		r.Context()
+		ctx := context.WithValue(r.Context(), ContextEmailKey, data.Email)
+		req := r.WithContext(ctx)
+		next.ServeHTTP(w, req)
 	})
 }
