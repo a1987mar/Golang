@@ -1,6 +1,7 @@
 package link
 
 import (
+	"fmt"
 	"go/adv-demo/pkg/db"
 )
 
@@ -70,11 +71,35 @@ func (repo *LinkRepository) Count() int64 {
 func (repo *LinkRepository) GetALL(limit, offset uint) []Link {
 	var links []Link
 	repo.Database.
-		Table("Links").
+		Table("links").
 		Where("deleted_at is null").
-		Order("is asc").
+		Order("id asc").
 		Limit(int(limit)).
 		Offset(int(offset)).
-		Scan(links)
+		Scan(&links)
 	return links
+}
+
+func (repo *LinkRepository) GetWhereLink(where_ string) []Link {
+	var links []Link
+	whereString := fmt.Sprintf("url ILIKE '%%%s%%'", where_)
+
+	repo.Database.
+		Table("links").
+		Where(whereString).
+		Where("deleted_at is null").
+		Scan(&links)
+	return links
+}
+
+type GetAllLinkCount struct {
+	Links  []Link `json:"links"`
+	CountL int64  `json:"count"`
+}
+
+func (repo *LinkRepository) GetAllLinkResponse(links_ []Link, countL int64) *GetAllLinkCount {
+	return &GetAllLinkCount{
+		Links:  links_,
+		CountL: countL,
+	}
 }

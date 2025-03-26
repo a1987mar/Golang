@@ -30,7 +30,8 @@ func NewAuthHandler(router *http.ServeMux, deps LinkHandlerDeps) {
 	router.Handle("PATCH /link/{id}", middleware.IsAuthed(handler.Update(), deps.Config))
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
 	router.HandleFunc("GET /link/{hash}", handler.Goto())
-
+	router.HandleFunc("GET /link", handler.GetLink())
+	router.HandleFunc("GET /link/getdomen/{domen}", handler.GetWhere())
 }
 
 func (c *LinkHandler) Create() http.HandlerFunc {
@@ -108,5 +109,36 @@ func (c *LinkHandler) Goto() http.HandlerFunc {
 			return
 		}
 		res.Json(w, getByHash, 200)
+	}
+}
+
+func (c *LinkHandler) GetLink() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		ld_int, err := strconv.Atoi(r.URL.Query().Get("limit"))
+		if err != nil {
+			http.Error(w, "Invalid limit", http.StatusBadRequest)
+			return
+		}
+		offint, err := strconv.Atoi(r.URL.Query().Get("offset"))
+		if err != nil {
+			http.Error(w, "Invalid offset", http.StatusBadRequest)
+			return
+		}
+		// res.Json(w, c.LinkRepository.GetALL(uint(ld_int), uint(offint)), 200)
+		getLinks := GetAllLinkCount{
+			Links:  c.LinkRepository.GetALL(uint(ld_int), uint(offint)),
+			CountL: c.LinkRepository.Count(),
+		}
+
+		res.Json(w, getLinks, 201)
+	}
+}
+
+func (c *LinkHandler) GetWhere() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		domenid := r.PathValue("domen")
+
+		res.Json(w, c.LinkRepository.GetWhereLink(domenid), 201)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"go/adv-demo/internal/auth"
 	"go/adv-demo/internal/link"
 	"go/adv-demo/internal/mark"
+	"go/adv-demo/internal/stat"
 	"go/adv-demo/internal/user"
 	"log"
 	"os"
@@ -22,6 +23,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	db.AutoMigrate(&link.Link{}, &auth.Reg{}, &mark.Mark{}, &user.User_{})
+	db.AutoMigrate(
+		&link.Link{},
+		&auth.Reg{},
+		&mark.Mark{},
+		&user.User_{},
+		&stat.Stat{})
 
 }
