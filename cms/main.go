@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	//
 	conf := configs.LoadConfig()
 	db := db.NewDb(conf)
 	router := http.NewServeMux()
